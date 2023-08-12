@@ -1,11 +1,10 @@
+#ifdef USE_C10D_NCCL
+
 #include <fmt/format.h>
 #include <torch/csrc/distributed/c10d/NCCLUtils.hpp>
 #include <torch/csrc/distributed/c10d/ProcessGroupNCCL.hpp>
 #include <torch/csrc/distributed/c10d/UCCForNCCL.hpp>
-#include <mutex>
 #include <sstream>
-
-#ifdef USE_C10D_NCCL
 
 #include <exception>
 #include <map>
@@ -1377,6 +1376,7 @@ std::exception_ptr ProcessGroupNCCL::checkForNCCLErrorsInternal(
       return std::make_exception_ptr(std::runtime_error(fmt::format(
           "NCCL communicator encountered error set by ProcessGroupNCCL: ",
           *commFailureReason)));
+              *commFailureReason)));
     }
     ncclResult_t ncclAsyncErr = ncclComm->checkForNcclError();
     if (ncclAsyncErr != ncclSuccess) {
