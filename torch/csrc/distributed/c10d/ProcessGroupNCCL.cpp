@@ -37,6 +37,30 @@ namespace c10d {
 
 constexpr const char* const kNCCLAbortedCommStoreKey = "NCCLABORTEDCOMM";
 
+DebugInfoWriter::DebugInfoWriter(int rank) {
+  std::string fileName = getCvarString(
+      {"TORCH_NCCL_DEBUG_INFO_TEMP_FILE"}, "/tmp/nccl_trace_rank_");
+  filename_ = fmt::format("{}{}", fileName, rank);
+}
+
+DebugInfoWriter::~DebugInfoWriter() = default;
+
+void DebugInfoWriter::write(const std::string& ncclTrace) {
+  // Open a file for writing. The ios::binary flag is used to write data as
+  // binary.
+  std::ofstream file(filename_, std::ios::binary);
+
+  // Check if the file was opened successfully.
+  if (!file.is_open()) {
+    LOG(ERROR) << "Error opening file for writing NCCLPG debug info: "
+               << filename_;
+    return;
+  }
+
+  file.write(ncclTrace.data(), ncclTrace.size());
+  LOG(INFO) << "Wrote finished ";
+}
+
 namespace {
 
 #if defined(NCCL_MAJOR) && \
@@ -153,8 +177,8 @@ ncclRedOpRAII getNcclReduceOp(
   } catch (const std::out_of_range& e) {
     switch (reduceOp) {
       case ReduceOp::AVG:
-        TORCH_CHECK(
-            false,
+        C10_THROW_ERROR(
+            ValueError,
             fmt::format(
                 "AVG requires NCCL 2.10+. The current version is {}.{}",
                 NCCL_MAJOR,
@@ -1145,6 +1169,56 @@ ProcessGroupNCCL::~ProcessGroupNCCL() {
   abort(abortReason);
 }
 
+  // Store debug info to storage if no other thread does it. (By default to
+  // local disk)
+  auto maybeWriteDebugInfo = tryWriteDebugInfo();
+
+  // Create a error message reported from MonitorThread, so
+  // we throw exception and make the whole process to be killed.
+  const auto exitMsg = fmt::format(
+      "[Rank {}] NCCL monitor thread timeout. Basically, this could ",
+      "be due to CUDA or NCCL calls being unexpectedly blocking, ",
+      "especially when your program enters a deadlock state in watchdog"
+      "or destructors. If you see this error, please file a bug to pytorch.",
+      rank_);
+
+  // There are two possible cases for the watchdog thread exit:
+  // Case one: desync report runs quickly, and it follows the step:
+  // collective timeout -> desync -> exception handling -> destructors
+  // -> set terminateHeartbeatMonitorThread_ -> notify monitorWakeUpCV_.
+  // So the code either early returns above or will skip the sleep below.
+  // Case two: desync might be slow or get stuck. Or we get stuck in
+  // destructors, we will sleep for some time before calling std::abort() to
+  // kill the whole process.
+  if ((terminateProcessGroup_.load() || collectiveDebugInfoMode_.load() ||
+       (maybeWriteDebugInfo && maybeWriteDebugInfo->joinable())) &&
+      !terminateHeartbeatMonitorThread_.load()) {
+    // Leave another two mins for desync report generation or process group
+    // destroy.
+    std::this_thread::sleep_for(std::chrono::seconds(heartbeatTimeoutInSec_));
+  }
+
+  // At this point, we either already sleep for another `heartbeatTimeoutInSec_`
+  // or the thread has finished. Because we don't want to block the monitor
+  // thread, so We mark the thread detach and the dump of debug info becomes
+  // "best effort". If the process exit normally, marking it detach also makes
+  // sense because we don't really care about dumping the debug info.
+  if (maybeWriteDebugInfo && maybeWriteDebugInfo->joinable()) {
+    maybeWriteDebugInfo->detach();
+  }
+
+  if (!terminateHeartbeatMonitorThread_.load()) {
+    const auto logMsg = fmt::format(
+        "[Rank {}] monitoring thread detects no heartbeat and will finally kill the process!",
+        " terminateProcessGroup_{} collectiveDebugInfoMode_{}",
+        rank_,
+        terminateProcessGroup_,
+        collectiveDebugInfoMode_);
+    LOG(ERROR) << logMsg;
+    terminateProcess(exitMsg);
+  }
+}
+
 void ProcessGroupNCCL::ncclCommWatchdog() {
   try {
     VLOG(2) << "[Rank " << rank_ << "] NCCL watchdog thread started!";
@@ -1374,9 +1448,11 @@ std::exception_ptr ProcessGroupNCCL::checkForNCCLErrorsInternal(
     // commFailureReason is set.
     auto commFailureReason = ncclComm->getNcclCommFailureReason();
     if (commFailureReason != c10::nullopt) {
-      return std::make_exception_ptr(std::runtime_error(fmt::format(
-          "NCCL communicator encountered error set by ProcessGroupNCCL: {}",
-          *commFailureReason)));
+      return std::make_exception_ptr(C10_BUILD_ERROR(
+          DistBackendError,
+          fmt::format(
+              "NCCL communicator encountered error set by ProcessGroupNCCL: {}",
+              *commFailureReason)));
     }
     ncclResult_t ncclAsyncErr = ncclComm->checkForNcclError();
     if (ncclAsyncErr != ncclSuccess) {
@@ -1431,13 +1507,13 @@ void ProcessGroupNCCL::broadcastUniqueNCCLID(
           rank_,
           storeKey,
           storeKey);
-      TORCH_CHECK(
-          false,
+      C10_THROW_ERROR(
+          DistBackendError,
           exceptionMsg + e.what() +
               ". This may indicate a possible application crash on rank 0 or a network set up issue.");
     } catch (...) {
-      TORCH_CHECK(
-          false,
+      C10_THROW_ERROR(
+          DistBackendError,
           fmt::format(
               "Unknown exception while [{}] is setting up NCCL communicator and "
               "retrieving ncclUniqueId from [0] via c10d key-value store by key '{}"
@@ -1763,8 +1839,8 @@ std::vector<at::Tensor> flatten_for_scatter_gather(
 
   for (const auto i : c10::irange(size_t{}, num_devices)) {
     if (tensor_lists[i].size() != world_size * num_devices) {
-      TORCH_CHECK(
-          false,
+      C10_THROW_ERROR(
+          ValueError,
           fmt::format(
               "Tensor list input to scatter/gather must match number of collective participants ",
               "but got {} inputs with world_size {} and {} devices.",
@@ -3350,7 +3426,7 @@ c10::intrusive_ptr<Work> ProcessGroupNCCL::send(
       },
       dstRank,
       OpType::SEND,
-      c10::str("nccl:send ", rank_, "->", dstRank).c_str());
+      fmt::format("nccl:send {}->{}", rank_, dstRank).c_str());
   return ret;
 }
 
@@ -3388,7 +3464,7 @@ c10::intrusive_ptr<Work> ProcessGroupNCCL::recv(
       },
       srcRank,
       OpType::RECV,
-      c10::str("nccl:recv ", rank_, "<-", srcRank).c_str());
+      fmt::format("nccl:recv {}<-{}", rank_, srcRank).c_str());
   return ret;
 }
 #else
