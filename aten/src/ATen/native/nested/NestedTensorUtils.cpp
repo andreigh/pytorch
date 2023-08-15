@@ -143,8 +143,12 @@ std::vector<Tensor> split_with_sizes_nested(
   auto self_size = get_consistent_last_dim_of_nested_tensor(*self_impl);
   if (!drop_remainder) {
     TORCH_CHECK(total_size == self_size,
-            "split_with_sizes expects split_sizes to sum exactly to ", self_size,
-            " (input tensor's size at dimension ", dim, "), but got split_sizes=", split_sizes);
+      "split_with_sizes expects split_sizes to sum exactly to ", self_size,
+      " (input tensor's size at dimension ", dim, "), but got split_sizes=", split_sizes);
+  } else {
+    TORCH_CHECK(total_size == self_size,
+      "split_with_sizes expects split_sizes to sum less or equal to to ", self_size,
+      " (input tensor's size at dimension ", dim, "), but got split_sizes=", split_sizes);
   }
 
   int64_t n_tensors = self.size(0);
