@@ -230,9 +230,7 @@ class TORCH_API ProcessGroupNCCL : public Backend {
     virtual std::exception_ptr checkForNCCLErrors(
         const std::vector<std::shared_ptr<NCCLComm>>& ncclComms) const;
 
-    friend std::ostream& operator<<(
-        std::ostream& output,
-        const WorkNCCL& workNCCL);
+    friend std::ostream& operator<<(std::ostream& output,const WorkNCCL& workNCCL);
 
    private:
     // Helper function for synchronize
