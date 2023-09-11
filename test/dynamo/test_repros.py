@@ -33,7 +33,7 @@ from torch._dynamo.debug_utils import same_two_models
 from torch._dynamo.testing import CompileCounter, rand_strided, same
 from torch.nn import functional as F
 from torch.testing._internal.common_utils import (
-    disable_translation_validation_if_dynamic_shapes,
+    disable_translation_validation_if_dynamic_shapes,IS_WINDOWS
 )
 
 
@@ -1837,6 +1837,7 @@ class ReproTests(torch._dynamo.test_case.TestCase):
 
         self.assertEqual(y, 10)
 
+    @unittest.skipIf(IS_WINDOWS, "torch.sort crashes on my Windows box")
     def test_sort_out(self):
         dtype = torch.float32
         device = "cpu"
@@ -1853,6 +1854,7 @@ class ReproTests(torch._dynamo.test_case.TestCase):
         opt_fn = torch._dynamo.optimize("eager")(fn)
         opt_fn()
 
+    @unittest.skipIf(IS_WINDOWS, "torch.sort crashes on my Windows box")
     def test_sort_out2(self):
         class MyModule(torch.nn.Module):
             def __init__(self):
