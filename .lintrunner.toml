@@ -89,7 +89,7 @@ init_command = [
 command = [
     'python',
     'tools/linter/adapters/clangformat_linter.py',
-    '--binary=C:/Program Files/LLVM/bin/clang-format.exe',
+    '--binary=C:/ProgramData/miniconda3/envs/pytorch/Lib/site-packages/clang_format/data/bin/clang-format.exe',
     '--',
     '@{{PATHSFILE}}'
 ]
