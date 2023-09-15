@@ -87,9 +87,9 @@ init_command = [
     '--output-name=clang-format',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/clangformat_linter.py',
-    '--binary=.lintbin/clang-format',
+    '--binary=C:/Program Files/LLVM/bin/clang-format.exe',
     '--',
     '@{{PATHSFILE}}'
 ]
