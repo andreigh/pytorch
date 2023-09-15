@@ -171,10 +171,10 @@ bool check_sm_version(cudaDeviceProp * dprops) {
 
 bool check_flash_attention_hardware_support(sdp_params const& params, bool debug) {
   // Check that the gpu is capable of running flash attention
-  using sm80 = SMVersion<8, 0>;
+  using sm50 = SMVersion<5, 0>;
   using sm90 = SMVersion<9, 0>;
   auto dprops = at::cuda::getCurrentDeviceProperties();
-  if (!check_sm_version<sm80, sm90>(dprops)) {
+  if (!check_sm_version<sm50, sm90>(dprops)) {
     if (debug) {
       TORCH_WARN(
           "Flash attention only supports gpu architectures in the range [sm80, sm90]. Attempting to run on a sm ",
