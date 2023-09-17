@@ -29,13 +29,13 @@ exclude_patterns = [
     'tools/test/test_selective_build.py',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/flake8_linter.py',
     '--',
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'flake8==6.0.0',
@@ -78,7 +78,7 @@ exclude_patterns = [
     'aten/src/ATen/dlpack.h',
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/s3_init.py',
     '--config-json=tools/linter/adapters/s3_init_config.json',
     '--linter=clang-format',
@@ -150,14 +150,14 @@ exclude_patterns = [
     'torch/_subclasses/fake_tensor.py',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/mypy_linter.py',
     '--config=mypy.ini',
     '--',
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'numpy==1.24.3',
@@ -206,7 +206,7 @@ exclude_patterns = [
     'torch/_inductor/scheduler.py',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/mypy_linter.py',
     '--config=mypy-nofollow.ini',
     '--code=MYPYNOFOLLOW',
@@ -214,7 +214,7 @@ command = [
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'types-colorama==0.4.6',
@@ -244,7 +244,7 @@ exclude_patterns = [
     'tools/test/test_selective_build.py',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/mypy_linter.py',
     '--config=mypy-strict.ini',
     '--code=MYPYSTRICT',
@@ -285,7 +285,7 @@ exclude_patterns = [
     'torch/csrc/mps/**/*',
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/s3_init.py',
     '--config-json=tools/linter/adapters/s3_init_config.json',
     '--linter=clang-tidy',
@@ -294,7 +294,7 @@ init_command = [
     '--output-name=clang-tidy',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/clangtidy_linter.py',
     '--binary=.lintbin/clang-tidy',
     '--build_dir=./build',
@@ -311,7 +311,7 @@ exclude_patterns = [
     'test/test_jit.py',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=# type:\s*ignore([^\[]|$)',
     '--linter-name=TYPEIGNORE',
@@ -333,7 +333,7 @@ exclude_patterns = [
     '**/fb/**'
     ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=# noqa([^:]|$)',
     '--linter-name=NOQA',
@@ -350,7 +350,7 @@ command = [
 code = 'CIRCLECI'
 include_patterns=['.circleci/**']
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/circleci_linter.py',
     '--regen-script-working-dir=.circleci',
     '--config-yml=.circleci/config.yml',
@@ -361,12 +361,12 @@ command = [
 code = 'NATIVEFUNCTIONS'
 include_patterns=['aten/src/ATen/native/native_functions.yaml']
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/nativefunctions_linter.py',
     '--native-functions-yml=aten/src/ATen/native/native_functions.yaml',
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'ruamel.yaml==0.17.4',
@@ -393,7 +393,7 @@ exclude_patterns=[
     '**/*.gz',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/newlines_linter.py',
     '--',
     '@{{PATHSFILE}}',
@@ -404,7 +404,7 @@ is_formatter = true
 code = 'CONSTEXPR'
 include_patterns=['aten/src/ATen/native/cuda/*.cu']
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/constexpr_linter.py',
     '--',
     '@{{PATHSFILE}}',
@@ -457,7 +457,7 @@ exclude_patterns = [
     '.lintrunner.toml',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     # @lint-ignore TXT2
     '--pattern=	',
@@ -487,7 +487,7 @@ exclude_patterns = [
     'torch/csrc/utils/pythoncapi_compat.h',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=#include "',
     '--linter-name=INCLUDE',
@@ -512,7 +512,7 @@ exclude_patterns = [
     'caffe2/**/*',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=#include <pybind11\/',
     '--allowlist-pattern=#include <torch\/csrc\/utils\/pybind.h>',
@@ -546,7 +546,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=isinstance\([^)]+(int|float)\)',
     '--linter-name=ERROR_PRONE_ISINSTANCE',
@@ -583,7 +583,7 @@ exclude_patterns = [
     'c10/**/*',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=PYBIND11_DECLARE_HOLDER_TYPE',
     '--linter-name=PYBIND11_SPECIALIZATION',
@@ -612,7 +612,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     """--pattern=\
     (pip|pip3|python -m pip|python3 -m pip|python3 -mpip|python -mpip) \
@@ -645,7 +645,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/exec_linter.py',
     '--',
     '@{{PATHSFILE}}',
@@ -659,7 +659,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=#include <cub/',
     '--linter-name=CUBINCLUDE',
@@ -686,7 +686,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=cudaStreamSynchronize',
     '--linter-name=RAWCUDA',
@@ -717,7 +717,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=cudaSetDevice(',
     '--pattern=cudaGetDevice(',
@@ -749,7 +749,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=logging\.(debug|info|warn|warning|error|critical|log|exception)\(',
     '--replace-pattern=s/logging\.(debug|info|warn|warning|error|critical|log|exception)\(/log.\1(/',
@@ -769,7 +769,7 @@ include_patterns = [
     '**/*.py',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=sys\.executable == .torch_deploy.',
     '--replace-pattern=s/sys\.executable == .torch_deploy./torch._running_with_deploy\(\)/',
@@ -801,14 +801,14 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/cmake_linter.py',
     '--config=.cmakelintrc',
     '--',
     '@{{PATHSFILE}}',
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'cmakelint==1.4.1',
@@ -823,13 +823,13 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/shellcheck_linter.py',
     '--',
     '@{{PATHSFILE}}',
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'shellcheck-py==0.7.2.1',
@@ -848,14 +848,14 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/actionlint_linter.py',
     '--binary=.lintbin/actionlint',
     '--',
     '@{{PATHSFILE}}',
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/s3_init.py',
     '--config-json=tools/linter/adapters/s3_init_config.json',
     '--linter=actionlint',
@@ -875,7 +875,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/testowners_linter.py',
     '--',
     '@{{PATHSFILE}}',
@@ -893,7 +893,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=std::call_once',
     '--linter-name=CALL_ONCE',
@@ -917,7 +917,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=std::once_flag',
     '--linter-name=ONCE_FLAG',
@@ -940,13 +940,13 @@ include_patterns = [
     '.github/workflows/slow.yml',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/workflow_consistency_linter.py',
     '--',
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'PyYAML==6.0',
@@ -2571,7 +2571,7 @@ exclude_patterns = [
     'torch/utils/weak.py',
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     '--no-black-binary',
@@ -2590,7 +2590,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/grep_linter.py',
     '--pattern=Confidential and proprietary',
     '--linter-name=COPYRIGHT',
@@ -2607,14 +2607,14 @@ command = [
 code = 'BAZEL_LINTER'
 include_patterns = ['WORKSPACE']
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/bazel_linter.py',
     '--binary=.lintbin/bazel',
     '--',
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/s3_init.py',
     '--config-json=tools/linter/adapters/s3_init_config.json',
     '--linter=bazel',
@@ -2632,7 +2632,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/lintrunner_version_linter.py'
 ]
 
@@ -2650,7 +2650,7 @@ exclude_patterns = [
     '**/fb/**',
 ]
 command = [
-    'python3',
+    'python',
     'tools/linter/adapters/ruff_linter.py',
     '--config=pyproject.toml',
     '--show-disable',
@@ -2658,7 +2658,7 @@ command = [
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python3',
+    'python',
     'tools/linter/adapters/pip_init.py',
     '--dry-run={{DRYRUN}}',
     'ruff==0.1.1',
