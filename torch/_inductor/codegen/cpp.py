@@ -2887,7 +2887,9 @@ class KernelGroup:
         code.writeline(codecache.cpp_prefix())
 
         if sys.platform == "win32":
-            code.writeline(f'extern "C" __declspec(dllexport) void {kernel_decl_name}({arg_defs})')
+            code.writeline(
+                f'extern "C" __declspec(dllexport) void {kernel_decl_name}({arg_defs})'
+            )
         else:
             code.writeline(f'extern "C" void {kernel_decl_name}({arg_defs})')
         with code.indent():

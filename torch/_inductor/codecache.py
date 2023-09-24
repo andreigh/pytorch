@@ -848,8 +848,10 @@ cdll.LoadLibrary("__lib_path__")
             if sys.platform == "win32":
                 suffix = "dll"
             output_path = input_path[:-3] + suffix
-            command = cpp_compile_command(input_path, output_path, warning_all=False, vec_isa=self)
-            if sys.platform == 'win32':
+            command = cpp_compile_command(
+                input_path, output_path, warning_all=False, vec_isa=self
+            )
+            if sys.platform == "win32":
                 build_cmd = shlex.split(command, posix=0)
             else:
                 build_cmd = shlex.split(command)
@@ -1620,7 +1622,7 @@ class CppCodeCache:
                     command = cpp_compile_command(
                         input=input_path, output=output_path, vec_isa=picked_vec_isa
                     )
-                    if sys.platform == 'win32':
+                    if sys.platform == "win32":
                         cmd = shlex.split(command, posix=0)
                     else:
                         cmd = shlex.split(command)
