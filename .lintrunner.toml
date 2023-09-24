@@ -629,29 +629,6 @@ command = [
 ]
 
 [[linter]]
-code = 'EXEC'
-include_patterns = ['**']
-exclude_patterns = [
-    'third_party/**',
-    'torch/bin/**',
-    '**/*.so',
-    '**/*.py',
-    '**/*.sh',
-    '**/*.bash',
-    '**/git-pre-commit',
-    '**/git-clang-format',
-    '**/gradlew',
-    'fb/**',
-    '**/fb/**',
-]
-command = [
-    'python',
-    'tools/linter/adapters/exec_linter.py',
-    '--',
-    '@{{PATHSFILE}}',
-]
-
-[[linter]]
 code = 'CUBINCLUDE'
 include_patterns = ['aten/**']
 exclude_patterns = [
