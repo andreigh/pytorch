@@ -153,7 +153,7 @@ at::Tensor _cslt_sparse_mm(
   // special check for int8 int8 -> fp16 support
   if (out_dtype_opt.has_value()) {
     ScalarType out_dtype = out_dtype_opt.value();
-    if (input_type == CUDA_R_8I and out_dtype == at::ScalarType::Half)
+    if (input_type == CUDA_R_8I && out_dtype == at::ScalarType::Half)
     {
         output_type = CUDA_R_16F;
         mixed_dtype_mode = true;
