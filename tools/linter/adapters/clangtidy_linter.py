@@ -131,10 +131,9 @@ def clang_search_dirs() -> List[str]:
 
 include_args = []
 include_dir = [
-    "/usr/lib/llvm-11/include/openmp",
     get_python_include_dir(),
     os.path.join(PYTORCH_ROOT, "third_party/pybind11/include"),
-] + clang_search_dirs()
+]
 for dir in include_dir:
     include_args += ["--extra-arg", f"-I{dir}"]
 

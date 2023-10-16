@@ -296,7 +296,7 @@ init_command = [
 command = [
     'python',
     'tools/linter/adapters/clangtidy_linter.py',
-    '--binary=.lintbin/clang-tidy',
+    '--binary=C:/ProgramData/miniconda3/envs/pytorch/Lib/site-packages/clang_tidy/data/bin/clang-tidy.exe',
     '--build_dir=./build',
     '--',
     '@{{PATHSFILE}}'
