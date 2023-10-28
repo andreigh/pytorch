@@ -155,10 +155,10 @@ ncclRedOpRAII getNcclReduceOp(
       case ReduceOp::AVG:
         TORCH_CHECK(
             false,
-            "AVG requires NCCL 2.10+. The current version is ",
-            NCCL_MAJOR,
-            ".",
-            NCCL_MINOR);
+            fmt::format(
+                "AVG requires NCCL 2.10+. The current version is {}.{}",
+                NCCL_MAJOR,
+                NCCL_MINOR));
         break;
       case ReduceOp::BAND:
         TORCH_CHECK(false, "Cannot use ReduceOp.BAND with NCCL");
@@ -700,7 +700,7 @@ bool ProcessGroupNCCL::WorkNCCL::checkTimeout(
 void ProcessGroupNCCL::WorkNCCL::handleException(
     ErrorHandlingMode errorHandling) {
   if (exception_) {
-    auto exceptionMsg = c10::str(
+    auto exceptionMsg = fmt::format(
         "Some NCCL operations have failed or timed out. Due to the ",
         "asynchronous nature of CUDA kernels, subsequent GPU operations ",
         "might run on corrupted/incomplete data.");
@@ -708,7 +708,7 @@ void ProcessGroupNCCL::WorkNCCL::handleException(
     C10_LOG_API_USAGE_ONCE("ProcessGroupNCCL.WorkNCCL.handleException");
 
     if (SHOULD_TEAR_DOWN(errorHandling)) {
-      auto tearDownMsg = c10::str(
+      auto tearDownMsg = fmt::format(
           "To avoid data inconsistency, we are taking the entire process down.");
       LOG(ERROR) << tearDownMsg;
       std::rethrow_exception(exception_);
@@ -1118,7 +1118,7 @@ void ProcessGroupNCCL::shutdown() {
   // potentially block and hence avoid it in this method.
   terminateProcessGroup_.store(true);
 
-  std::string abortReason = c10::str("Process Group shutdown on rank ", rank_);
+  std::string abortReason = fmt::format("Process Group shutdown on rank {}", rank_);
   abort(abortReason);
 
   workMetaListCV_.notify_one();
@@ -1139,8 +1139,7 @@ ProcessGroupNCCL::~ProcessGroupNCCL() {
 
   // Abort communicators after all threads have exited to avoid having the
   // threads dying due to aborted communicator and raising a SIGABRT
-  std::string abortReason =
-      fmt::format("Process Group destroyed on rank {}", rank_);
+  std::string abortReason = fmt::format("Process Group destroyed on rank {}", rank_);
   abort(abortReason);
 }
 
@@ -1336,12 +1335,12 @@ void ProcessGroupNCCL::runHookLoop() {
         // PythonOnCompletionHook has already extracted Python exception message
         // and wrapped it with a cpp one. So we no longer need to acquire GIL
         // here.
-        const auto errorStr = c10::str(
-            "Caught exception on rank ",
+        const auto errorStr = fmt::format(
+            "Caught exception on rank {}",
+            " while running onCompletion hook for ProcessGroupNCCL: {}",
+            ". Aborting all communicators.",
             rank_,
-            " while running onCompletion hook for ProcessGroupNCCL: ",
-            e.what(),
-            ". Aborting all communicators.");
+            e.what());
 
         // No need to call abort() on WorkNCCL here as that collective has
         // already finished successfully at this point. We just need to abort
@@ -1764,16 +1763,12 @@ std::vector<at::Tensor> flatten_for_scatter_gather(
     if (tensor_lists[i].size() != world_size * num_devices) {
       TORCH_CHECK(
           false,
-          c10::str(
+          fmt::format(
               "Tensor list input to scatter/gather must match number of collective participants ",
-              "but got ",
+              "but got {} inputs with world_size {} and {} devices.",
               tensor_lists[i].size(),
-              " inputs",
-              " with world_size ",
               world_size,
-              " and ",
-              num_devices,
-              " devices."));
+              num_devices));
     }
 
     // Only check device match for the first tensor in the list; the call to
