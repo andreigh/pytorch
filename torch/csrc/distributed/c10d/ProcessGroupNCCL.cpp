@@ -1374,9 +1374,8 @@ std::exception_ptr ProcessGroupNCCL::checkForNCCLErrorsInternal(
     auto commFailureReason = ncclComm->getNcclCommFailureReason();
     if (commFailureReason != c10::nullopt) {
       return std::make_exception_ptr(std::runtime_error(fmt::format(
-          "NCCL communicator encountered error set by ProcessGroupNCCL: ",
+          "NCCL communicator encountered error set by ProcessGroupNCCL: {}",
           *commFailureReason)));
-              *commFailureReason)));
     }
     ncclResult_t ncclAsyncErr = ncclComm->checkForNcclError();
     if (ncclAsyncErr != ncclSuccess) {
