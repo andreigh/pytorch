@@ -1118,7 +1118,8 @@ void ProcessGroupNCCL::shutdown() {
   // potentially block and hence avoid it in this method.
   terminateProcessGroup_.store(true);
 
-  std::string abortReason = fmt::format("Process Group shutdown on rank {}", rank_);
+  std::string abortReason =
+      fmt::format("Process Group shutdown on rank {}", rank_);
   abort(abortReason);
 
   workMetaListCV_.notify_one();
@@ -1139,7 +1140,8 @@ ProcessGroupNCCL::~ProcessGroupNCCL() {
 
   // Abort communicators after all threads have exited to avoid having the
   // threads dying due to aborted communicator and raising a SIGABRT
-  std::string abortReason = fmt::format("Process Group destroyed on rank {}", rank_);
+  std::string abortReason =
+      fmt::format("Process Group destroyed on rank {}", rank_);
   abort(abortReason);
 }
 
